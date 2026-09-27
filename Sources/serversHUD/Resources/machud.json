@@ -1,0 +1,18 @@
+{
+  "id": "xyz.machud.servershud",
+  "name": "serversHUD",
+  "socket": "servershud",
+  "panels": [
+    {
+      "id": "servers",
+      "title": "Dev Servers",
+      "symbol": "server.rack",
+      "kind": "hover",
+      "defaultSize": [620, 420],
+      "compactSize": [44, 44],
+      "verbs": ["show", "hide", "toggle", "frame", "mode", "refresh", "kill", "open", "list"],
+      "settingsSchema": "settings.json",
+      "order": 5
+    }
+  ]
+}

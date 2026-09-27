@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "settings": [
+    {
+      "key": "refreshInterval",
+      "title": "Refresh every (seconds)",
+      "type": "int",
+      "default": 2,
+      "help": "How often the list rescans while the panel is visible (1-60). Hidden, it rescans every 15 s to keep the badge current."
+    },
+    {
+      "key": "devOnly",
+      "title": "Show dev servers only",
+      "type": "bool",
+      "default": true,
+      "help": "Hide system daemons, other users' processes and GUI apps that listen on ports. The panel's Dev only toggle starts from this."
+    },
+    {
+      "key": "ignore",
+      "title": "Ignore these processes",
+      "type": "string",
+      "default": "",
+      "help": "Comma-separated process names (as lsof shows them, e.g. \"Beeper Desktop, zed\") never listed in dev-only mode or counted in the badge."
+    }
+  ]
+}
