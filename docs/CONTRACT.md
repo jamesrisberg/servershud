@@ -116,7 +116,7 @@ SERVERSHUD_SOCKET=servershud-test build/serversHUD.app/Contents/Helpers/serversh
 
 | Flag | Effect |
 |---|---|
-| `--snapshot <path.png>` | show the panel and write a PNG of it 2 s later, once the first scan has landed (logged; the app keeps running) |
+| `--snapshot <path.png>` | show the panel and write a PNG of it 2 s later, once the first scan has landed (logged; the app keeps running); serves no control socket, announces nothing, registers no hotkey and adds no menu bar item, so it never touches a running instance |
 | `--snapshot-mode compact` | with `--snapshot`: picture the 44 pt tile |
 | `--all` | start with Dev only off |
 | `--search <query>` | start with the search field filled |
