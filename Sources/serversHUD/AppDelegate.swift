@@ -8,17 +8,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var panel: PanelController!
     private var statusItem: NSStatusItem!
     private var control: ControlHost!
+    /// The desktop widgets (`running`); kept for the app's lifetime.
+    private var widgets: HUDWidgetHost!
     private var timer: Timer?
     private var timerInterval: TimeInterval = 0
     static let toggleHotKey = HUDHotKey(key: "p", modifiers: ["control", "option"])
     /// While the panel is hidden or parked the badge is kept current at this slower pace.
     static let backgroundInterval: TimeInterval = 15
+    /// While a desktop widget is placed the list is kept this fresh, panel or no panel.
+    static let widgetInterval: TimeInterval = 5
+
+    /// How often to rescan: `refreshInterval` while the panel is on screen, 15 s otherwise, and
+    /// never slower than `widgetInterval` while a widget is on the desktop.
+    static func scanInterval(panelLive: Bool, refreshInterval: Int, widgetCount: Int) -> TimeInterval {
+        let base = panelLive ? TimeInterval(refreshInterval) : backgroundInterval
+        return widgetCount > 0 ? min(base, widgetInterval) : base
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         HUDEditMenu.install(appName: "serversHUD")
         model = AppModel(settingsURL: AppEnvironment.settingsURL)
         panel = PanelController(model: model)
         control = ControlHost(model: model, panel: panel)
+        // Before start(): MacHUD sends `widget sync` as soon as it connects.
+        widgets = ServersWidgets.makeHost(manifest: control.manifest, model: model) { [weak self] in self?.panel.show(takeFocus: true) }
+        control.router.widgetHost = widgets
         control.start()
         model.onScan = { [weak self] in self?.stateChanged() }
         panel.onStateChange = { [weak self] in self?.stateChanged() }
@@ -32,13 +46,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 model.show("⌃⌥P is taken by another app; use the menu bar icon", error: true)
             }
         }
-        model.refresh()
-        rescheduleTimer()
-
         let args = CommandLine.arguments
         func value(_ flag: String) -> String? {
             args.firstIndex(of: flag).flatMap { args.indices.contains($0 + 1) ? args[$0 + 1] : nil }
         }
+        // `--snapshot-widgets <dir>`: write running-<size>.png (and -empty) from sample servers
+        // and quit; no scan runs.
+        if let directory = value("--snapshot-widgets") {
+            do {
+                let files = try ServersWidgets.writeSnapshots(host: widgets, model: model, to: URL(fileURLWithPath: directory))
+                files.forEach { print($0.path) }
+            } catch {
+                NSLog("serversHUD: widget snapshot failed: %@", String(describing: error))
+                fputs("snapshot failed: \(error)\n", stderr)
+            }
+            NSApp.terminate(nil)
+            return
+        }
+        model.refresh()
+        rescheduleTimer()
         // `--search <query>` and `--all` set up the list (used with --snapshot).
         if let query = value("--search") { model.searchText = query }
         if args.contains("--all") { model.devOnly = false }
@@ -74,9 +100,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem?.button?.title = model.devServers.isEmpty ? "" : " \(model.badge)"
     }
 
-    /// `refreshInterval` (default 2 s) while the panel is on screen, 15 s otherwise.
     private func rescheduleTimer() {
-        let interval = panel.isLive ? TimeInterval(model.settings.refreshInterval) : Self.backgroundInterval
+        let interval = Self.scanInterval(panelLive: panel.isLive, refreshInterval: model.settings.refreshInterval,
+                                         widgetCount: widgets.instances.count)
         guard interval != timerInterval || timer == nil else { return }
         timer?.invalidate()
         timerInterval = interval

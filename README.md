@@ -12,6 +12,10 @@ directory (click to reveal it in Finder), the uptime and the full command line. 
 SIGTERM; Force sends SIGKILL after a second click. The link button copies the URL. Servers that
 just started glow green for a few seconds; ones that just stopped are named in the footer.
 
+It also serves a desktop widget, **Running Servers**: a small tile with the dev server count and a
+status dot, or a medium tile listing the first four (port, project, framework and uptime; click a
+row to open it in the browser). MacHUD places, moves and resizes widgets; see [Widgets](#widgets).
+
 Inside MacHUD it is a hover button in the tool dock: the panel slides out while the pointer is
 over it and hides when the pointer leaves. Compact mode is a 44 pt tile with a badge of the dev
 server count. Dismissing hides the panel; summoning brings it back as it was. The list rescans
@@ -54,11 +58,32 @@ the same three `lsof`/`ps` calls and the same JSON document
 (`{collector, generatedAt, entries: [{name, path, status, details}]}`). serversHUD's `details` add
 two fields devops does not have: `framework` and `dev`.
 
+## Widgets
+
+serversHUD serves one widget type, `running` ("Running Servers"), next to its hover panel. Add it
+from MacHUD's widget gallery (needs MacHUD with contract 0.3), then:
+
+| Size | Shows |
+|---|---|
+| small (1×1) | the dev server count, a green dot while any is listening, the first ports; click opens the panel |
+| medium (2×1) | up to four rows: `:port`, project (the working directory's name), framework and uptime; click a row to open `http://localhost:<port>`, click the header to open the panel |
+
+It counts what the panel's badge counts (Dev only, the `ignore` setting applied), so it has no
+settings of its own, and several can be placed. While a widget is on the desktop serversHUD
+rescans at least every 5 s, panel visible or not.
+
+```sh
+servershud widget create instance=a type=running size=medium frame=40,40,356,170
+servershud widget list
+servershud widget remove instance=a
+```
+
 ## MacHUD contract
 
-Panel `servers`, kind `hover`, dock `order` 5, socket `servershud`. Verbs: the HUDKit set
+Panel `servers`, kind `hover`, dock `order` 5, socket `servershud`; widget type `running`
+(`kind: widget`, sizes small and medium, no dock button). Verbs: the HUDKit set
 (`hello`, `state`, `subscribe`, `panel show|hide|toggle|frame|mode`, `settings get|set|schema`,
-`action`, `quit`) plus `action refresh`, `list`, `kill`, `open`. Full reference:
+`action`, `quit`, `widget`) plus `action refresh`, `list`, `kill`, `open`. Full reference:
 [docs/CONTRACT.md](docs/CONTRACT.md).
 
 ```sh
@@ -91,6 +116,9 @@ swift test          # serversHUDKitTests + serversHUDTests
 ./install.sh        # build, install to /Applications, link the CLI, launch
 build/serversHUD.app/Contents/MacOS/serversHUD --snapshot /tmp/servershud.png   # PNG of the panel
 ```
+
+`--snapshot-widgets <dir>` writes `running-small.png`, `running-medium.png` and their `-empty`
+variants from sample servers (no scan) and quits.
 
 `--snapshot` writes the PNG 2 s after launch (once the first scan has landed) and keeps running; `--snapshot-mode compact` pictures the tile, `--all` turns
 Dev only off, `--search <query>` filters. `build.sh` and `install.sh` call HUDKit's shared

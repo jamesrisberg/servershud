@@ -8,6 +8,8 @@ import serversHUDKit
 @MainActor
 final class ControlHost: HUDPanelHost {
     static let panelID = "servers"
+    /// The desktop widget type: a `kind: widget` manifest panel, served by `HUDWidgetHost` (see ServersWidget.swift).
+    static let widgetType = "running"
     static let actions = ["show", "hide", "toggle", "refresh", "kill", "open", "list"]
     static let verbs = ["show", "hide", "toggle", "frame", "mode", "refresh", "kill", "open", "list"]
 
@@ -16,6 +18,8 @@ final class ControlHost: HUDPanelHost {
         HUDManifest.Panel(id: panelID, title: "Dev Servers", symbol: "server.rack",
                           defaultSize: HUDSize(PanelController.fullSize), compactSize: HUDSize(PanelController.compactSize),
                           verbs: verbs, settingsSchema: "settings.json", kind: .hover, order: 5),
+        HUDManifest.Panel(id: widgetType, title: "Running Servers", symbol: "server.rack", kind: .widget,
+                          widget: HUDWidgetSpec(sizes: [.small, .medium], defaultSize: .small, multiple: true, refresh: 5)),
     ])
 
     let manifest: HUDManifest
