@@ -11,10 +11,14 @@ the [settings schema](https://github.com/jamesrisberg/hudkit/blob/main/docs/CONT
 the [launch announcement](https://github.com/jamesrisberg/hudkit/blob/main/docs/CONTRACT.md#launch-announcement) and [menu bar consolidation](https://github.com/jamesrisberg/hudkit/blob/main/docs/CONTRACT.md#menu-bar-consolidation).
 This page lists what serversHUD adds.
 
-- Manifest: `Sources/serversHUD/Resources/machud.json`: app `xyz.machud.servershud`, socket `servershud`, one panel
+- Manifest: `Sources/serversHUD/Resources/machud.json`: app `xyz.machud.servershud`, socket `servershud`, a hover panel
   `servers` (`kind: hover`, symbol `server.rack`, default 620x420, compact 44x44, settings schema
   `settings.json`, verbs `show hide toggle frame mode refresh kill open list`, dock `order` 5:
   after Scratch, Stash, ffmpegHUD and magickHUD).
+- Widget: a second manifest panel `running` (`kind: widget`, title "Running Servers", sizes
+  `small` and `medium`, default `small`, `multiple` true, `refresh` 5, no per-instance settings
+  schema). It is not a dock panel (HUDKit's `dockPanels` leaves it out) and takes no `panel`
+  verbs. `HUDWidgetHost` serves the `widget` verb (see [Widgets](https://github.com/jamesrisberg/hudkit/blob/main/docs/CONTRACT.md#widgets)); the host is set on the router before the socket starts, so MacHUD's `widget sync` after a connect restores the instances. A tap on the small widget or on the medium header opens the panel (`onOpen`), a tap on a medium row opens `http://localhost:<port>`. The widget reads the same scan as the panel (dev-only, the ignore list applied); while any instance exists serversHUD rescans at least every 5 s.
 - Hover: MacHUD shows the panel while the pointer is over its dock button and hides it on leave.
   `panel show`/`hide`/`toggle` fade in 0.22 s / out 0.18 s and keep the last frame and mode; a
   socket show never activates serversHUD, and only `reason=click`/`summon` makes the panel key
@@ -50,6 +54,7 @@ This page lists what serversHUD adds.
 | `action open` | `port=` (or `pid=` of a listed server) | opens `http://localhost:<port>`: `{url}` |
 | `action show` / `hide` / `toggle` | | same as the panel verbs |
 | `action snapshot` | `path=` | writes a PNG of the panel as it is (not in the manifest; for docs and checks) |
+| `widget` | `action=create\|update\|remove\|list\|sync\|edit\|reveal\|schema` | HUDKit's widget verb for type `running` (sizes `small`, `medium`); `schema` answers `unsupported` (no per-instance settings). `servershud widget list`, `widget create instance=a type=running frame=40,40,170,170` |
 | `quit` | | replies, then quits (the socket file is removed) |
 | `help` | | lists the registered commands |
 

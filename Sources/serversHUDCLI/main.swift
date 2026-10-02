@@ -23,6 +23,8 @@ usage: servershud <command> [key=value ...]
   panel show|hide|toggle id=servers
   panel frame id=servers x= y= w= h=
   panel mode id=servers full|compact|parked
+  widget list | create instance= type=running [size= frame=x,y,w,h layer=]
+  widget update|remove instance= ... | edit on|off | reveal on|off | schema type=running
   action <verb> [k=v ...]           the long form of list/kill/open/refresh
   settings get [key=]  |  settings set key=value ...
   watch [events=state]              stream events (Ctrl-C to stop)

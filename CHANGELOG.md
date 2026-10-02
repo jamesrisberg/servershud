@@ -6,6 +6,16 @@ All notable changes to serversHUD are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Running Servers desktop widget (small and medium): the dev server count with a status dot, or
+  the first four servers with port, project, framework and uptime; click a row to open it in the
+  browser. Needs MacHUD with widget support (HUDKit contract 0.3).
+- `servershud widget ...` and `--snapshot-widgets <dir>` (PNGs of the widget from sample data).
+
+### Changed
+- Built with HUDKit 0.3.0. While a widget is on the desktop the server list rescans at least every
+  5 s even when the panel is hidden.
+
 ## [0.2.0] - 2026-09-29
 
 ### Changed

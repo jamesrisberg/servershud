@@ -32,6 +32,20 @@ final class ManifestTests: XCTestCase {
         XCTAssertEqual(schema.field("ignore")?.type, .string)
     }
 
+    func testWidgetPanel() throws {
+        let manifest = try HUDManifest.decode(Data(contentsOf: resources.appendingPathComponent(HUDManifest.fileName)))
+        let widget = try XCTUnwrap(manifest.panel(id: "running"))
+        XCTAssertEqual(widget.kind, .widget)
+        XCTAssertEqual(widget.symbol, "server.rack")
+        let spec = try XCTUnwrap(widget.widget)
+        XCTAssertEqual(spec.sizes, [.small, .medium])
+        XCTAssertEqual(spec.defaultSize, .small)
+        XCTAssertNil(spec.settingsSchema, "no per-instance settings: the app-wide ignore list applies")
+        XCTAssertEqual(manifest.widgetPanels.map(\.id), ["running"])
+        XCTAssertEqual(manifest.dockPanels.map(\.id), ["servers"], "the widget never becomes a dock button")
+        XCTAssertEqual(manifest.panels.count, 2)
+    }
+
     @MainActor
     func testBuiltinManifestMirrorsTheFile() throws {
         let file = try HUDManifest.decode(Data(contentsOf: resources.appendingPathComponent(HUDManifest.fileName)))

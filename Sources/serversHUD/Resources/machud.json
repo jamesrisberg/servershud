@@ -13,6 +13,18 @@
       "verbs": ["show", "hide", "toggle", "frame", "mode", "refresh", "kill", "open", "list"],
       "settingsSchema": "settings.json",
       "order": 5
+    },
+    {
+      "id": "running",
+      "title": "Running Servers",
+      "symbol": "server.rack",
+      "kind": "widget",
+      "widget": {
+        "sizes": ["small", "medium"],
+        "defaultSize": "small",
+        "multiple": true,
+        "refresh": 5
+      }
     }
   ]
 }

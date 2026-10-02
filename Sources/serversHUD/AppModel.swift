@@ -37,6 +37,8 @@ final class AppModel: ObservableObject {
     private var waiters: [([Server]) -> Void] = []
     private var rescanRequested = false
     private var messageClear: DispatchWorkItem?
+    /// Set by `freeze(with:)`: scans stop and `servers` stays as given (for `--snapshot-widgets`).
+    private var frozen = false
 
     /// Called after every scan (for `state` events).
     var onScan: (() -> Void)?
@@ -78,6 +80,7 @@ final class AppModel: ObservableObject {
 
     /// Rescans (coalescing with a scan already running) and calls `completion` with the result.
     func refresh(completion: (([Server]) -> Void)? = nil) {
+        if frozen { completion?(servers); return }
         if let completion { waiters.append(completion) }
         if scanning { rescanRequested = true; return }
         scanning = true
@@ -90,7 +93,15 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Shows `servers` as the scan and stops scanning: deterministic data for snapshots.
+    func freeze(with servers: [Server]) {
+        frozen = true
+        self.servers = servers
+        lastScan = Date()
+    }
+
     private func apply(_ result: [Server]) {
+        if frozen { scanning = false; return }
         let now = Date()
         let next = ServerSnapshot(servers: result, takenAt: now)
         let diff = next.diff(since: snapshot)
