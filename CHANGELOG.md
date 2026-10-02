@@ -6,6 +6,8 @@ All notable changes to serversHUD are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-02
+
 ### Added
 - Running Servers desktop widget (small and medium): the dev server count with a status dot, or
   the first four servers with port, project, framework and uptime; click a row to open it in the
