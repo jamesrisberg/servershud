@@ -6,6 +6,20 @@ All notable changes to serversHUD are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-13
+
+### Changed
+- The panel's frosted backdrop is now the Mac's own blur of what is behind it under a light
+  tint, the same as the rest of the MacHUD family.
+
+### Fixed
+- The panel is already frosted when a desktop switch lands, instead of showing opaque for a
+  moment first.
+- Desktop widgets no longer go missing from a desktop. After a desktop switch, sleep and wake,
+  or a display change, a widget the system dropped comes back within a second or two.
+- Switching desktops or waking the Mac no longer resets every widget in the middle of the
+  switch.
+
 ## [0.3.0] - 2026-10-02
 
 ### Added
