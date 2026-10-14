@@ -21,6 +21,7 @@ final class FrameworkTests: XCTestCase {
     }
 
     func testRuntimes() {
+        XCTAssertEqual(detect("node", "/Users/me/.hermes/node/bin/node /Users/me/dev/app/server.mjs"), .node)
         XCTAssertEqual(detect("bun", "bun run dev.ts"), .node)
         XCTAssertEqual(detect("python3.12", "python3 -m http.server 8765"), .python)
         XCTAssertEqual(detect("uvicorn", "uvicorn app:main --reload"), .python)
